@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.atternatt.powercommit.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.atternatt.powercommit.MyBundle
 
 class MyApplicationService {
 
