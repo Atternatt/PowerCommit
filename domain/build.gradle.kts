@@ -18,6 +18,8 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:1.1.2")
     implementation("io.arrow-kt:arrow-fx-coroutines:1.1.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
+
 }
 
 tasks.getByName<Test>("test") {
