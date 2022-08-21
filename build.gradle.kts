@@ -14,6 +14,8 @@ plugins {
     id("org.jetbrains.changelog") version "1.3.1"
     // Gradle Qodana Plugin
     id("org.jetbrains.qodana") version "0.1.13"
+    //Gradle Compose
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 group = properties("pluginGroup")
@@ -46,6 +48,15 @@ qodana {
     reportPath.set(projectDir.resolve("build/reports/inspections").canonicalPath)
     saveReport.set(true)
     showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
+}
+
+dependencies {
+    implementation(compose.desktop.currentOs)
+    implementation(compose.material)
+    implementation(compose.ui)
+    implementation(compose.runtime)
+    implementation(compose.uiTooling)
+    implementation(compose.preview)
 }
 
 tasks {
