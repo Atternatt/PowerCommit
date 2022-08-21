@@ -57,6 +57,7 @@ dependencies {
     implementation(compose.runtime)
     implementation(compose.uiTooling)
     implementation(compose.preview)
+    implementation(project(":domain"))
 }
 
 tasks {
