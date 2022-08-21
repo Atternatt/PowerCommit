@@ -4,4 +4,4 @@ sealed interface DomainFailure
 
 object NotFound: DomainFailure
 object DataEmpty: DomainFailure
-object UnknownFailure: DomainFailure
+class UnknownFailure(val error: Exception) : DomainFailure
