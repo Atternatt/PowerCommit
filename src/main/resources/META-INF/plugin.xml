@@ -5,6 +5,7 @@
     <vendor>atternatt</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.github.atternatt.powercommit.services.MyApplicationService"/>
@@ -15,4 +16,13 @@
         <listener class="com.github.atternatt.powercommit.listeners.MyProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
+
+    <actions>
+        <action id="Commit.Button" class="com.github.atternatt.powercommit.CreateCommitAction"
+                text="Create Commit Message"
+                description="Open the commit creation form"
+                icon="/icons/load.png">
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
+        </action>
+    </actions>
 </idea-plugin>
