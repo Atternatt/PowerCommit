@@ -2,7 +2,8 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     // Java support
-    id("java")
+    kotlin("jvm")
+    kotlin("plugin.serialization") version "1.6.10"
 }
 
 group = properties("pluginGroup")
