@@ -1,8 +1,10 @@
 package com.github.atternatt.powercommit
 
+import com.github.atternatt.powercommit.feature.commits.presentation.CreateCommitDialog
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.vcs.CommitMessageI
 import com.intellij.openapi.vcs.VcsDataKeys
 import com.intellij.openapi.vcs.ui.Refreshable
@@ -14,11 +16,11 @@ class CreateCommitAction : AnAction(), DumbAware {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val commitMessage: CommitMessageI = getCommitPanel(actionEvent) ?: return
         actionEvent.project?.also {
-            /*val dialog = CreateCommitDialog(it)
+            val dialog = CreateCommitDialog(it)
             dialog.show()
             if (dialog.exitCode == DialogWrapper.OK_EXIT_CODE) {
                 commitMessage.setCommitMessage(dialog.getCommit())
-            }*/
+            }
         }
     }
 

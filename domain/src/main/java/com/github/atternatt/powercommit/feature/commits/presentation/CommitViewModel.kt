@@ -2,14 +2,13 @@ package com.github.atternatt.powercommit.feature.commits.presentation
 
 import arrow.core.Some
 import arrow.core.continuations.effect
-import com.github.atternatt.powercommit.feature.commits.di.PCDispatchers
 import com.github.atternatt.powercommit.feature.commits.model.Commit
 import com.github.atternatt.powercommit.feature.commits.model.CommitType
 import com.github.atternatt.powercommit.feature.commits.usecase.GetCommitTypesUseCase
 import com.github.atternatt.powercommit.feature.commits.usecase.GitMojiEnabledUseCase
 import com.github.atternatt.powercommit.feature.failue.DomainFailure
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -29,7 +28,7 @@ interface CommitViewModel {
      * item in [LoadedUiState.commitTypes]
      * @param index the index of the commit type
      */
-    suspend fun selectCommitType(index: Int)
+    fun selectCommitType(index: Int)
 
     /**
      * Set whether to use Gitmoji style or normal style
@@ -46,6 +45,7 @@ interface CommitViewModel {
      * Lifecycle event called to clean all the states when the object is no longer used
      */
     fun dispose()
+
 
     /**
      * UI state representation
@@ -75,36 +75,36 @@ interface CommitViewModel {
 
 fun commitViewModel(
     getCommitTypesUseCase: GetCommitTypesUseCase,
-    gitMojiEnabledUseCase: GitMojiEnabledUseCase,
-    pCDispatchers: PCDispatchers
+    gitMojiEnabledUseCase: GitMojiEnabledUseCase
 ): CommitViewModel = object : CommitViewModel, CoroutineScope {
 
-    override val coroutineContext: CoroutineContext = Job()
+    override val coroutineContext: CoroutineContext = SupervisorJob()
 
     //region State
     private val commitTypes = flow {
         emit(getCommitTypesUseCase.getCommitTypes())
     }
 
-    private val selectedCommitType = MutableStateFlow<Int>(0)
+    private val selectedCommitType = MutableStateFlow(0)
+
+//    val uiState: StateFlow<CommitViewModel.UiState> = launchMolecule(clock = Immediate) {
+//        TODO()
+//    }
 
     override val state: StateFlow<CommitViewModel.UiState> =
         combine(
-            commitTypes,
-            gitMojiEnabledUseCase.isGitmojiEnabled,
-            selectedCommitType
-        ) { types, gitmojiEnabled, selectedTypeIndex ->
+            gitMojiEnabledUseCase.getIsGitmojiEnabledStream().onStart { emit(false) },
+            selectedCommitType.onStart { emit(0) }
+        ) { gitmojiEnabled, selectedTypeIndex ->
             effect<DomainFailure, CommitViewModel.UiState> {
                 CommitViewModel.LoadedUiState(
-                    commitTypes = types.bind(),
+                    commitTypes = listOf(CommitType("😅", "aa", "aa", "aa", "aa", "aa")),
                     selectedCommitType = selectedTypeIndex,
                     useGitmoji = gitmojiEnabled
                 )
             }.toOption { Some(CommitViewModel.Error(it)) }
         }
-            .flowOn(pCDispatchers.io)
             .map { (it as Some).value }
-            .flowOn(pCDispatchers.main)
             .stateIn(
                 scope = this,
                 started = SharingStarted.WhileSubscribed(),
@@ -114,12 +114,12 @@ fun commitViewModel(
     //endregion
 
     //region API
-    override suspend fun selectCommitType(index: Int) {
-        selectedCommitType.emit(index)
+    override fun selectCommitType(index: Int) {
+        selectedCommitType.value = index
     }
 
     override fun useGitmoji(flag: Boolean) {
-        launch(pCDispatchers.io) {
+        launch {
             gitMojiEnabledUseCase.setGitmojiEnabled(flag)
         }
     }
@@ -127,7 +127,7 @@ fun commitViewModel(
     override fun getCommit(): Commit = TODO()
 
     override fun dispose() {
-        coroutineContext.cancel()
+        cancel()
     }
 
     //endregion

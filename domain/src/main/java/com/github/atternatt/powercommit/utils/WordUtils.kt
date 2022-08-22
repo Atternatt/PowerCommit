@@ -1,12 +1,10 @@
 package com.github.atternatt.powercommit.utils
 
-import jdk.xml.internal.SecuritySupport.getSystemProperty
-
 fun String.wrap(wrapLength: Int, newLineStr: String? = null, wrapLongWords: Boolean = false): String? {
   var wrapLength = wrapLength
   var newLineStr = newLineStr
   if (newLineStr == null) {
-    newLineStr = getSystemProperty("line.separator")
+    newLineStr = System.lineSeparator()
   }
   if (wrapLength < 1) {
     wrapLength = 1

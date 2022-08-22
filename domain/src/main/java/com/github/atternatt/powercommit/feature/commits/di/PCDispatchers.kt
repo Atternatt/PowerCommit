@@ -1,9 +1,7 @@
 package com.github.atternatt.powercommit.feature.commits.di
 
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import java.util.logging.Level
-import java.util.logging.Logger
+import kotlinx.coroutines.swing.Swing
 import kotlin.coroutines.CoroutineContext
 
 
@@ -13,9 +11,9 @@ interface PCDispatchers {
 }
 
 internal fun pluginDispatchers() = object : PCDispatchers {
-  private val handler = CoroutineExceptionHandler { _, exception ->
-    Logger.getGlobal().log(Level.SEVERE, exception.toString())
-  }
-  override val io: CoroutineContext = Dispatchers.IO + handler
-  override val main: CoroutineContext = Dispatchers.Main + handler
+  //  private val handler = CoroutineExceptionHandler { _, exception ->
+//    Logger.getGlobal().log(Level.SEVERE, exception.toString())
+//  }
+  override val io: CoroutineContext = Dispatchers.IO
+  override val main: CoroutineContext = Dispatchers.Swing
 }
