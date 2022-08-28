@@ -1,9 +1,7 @@
 package com.github.atternatt.powercommit.feature.commits.presentation
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -68,34 +66,40 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
     onTypeSelected: (Int) -> Unit,
     onGitmojiOptionChecked: (Boolean) -> Unit
   ) {
-    val scope = rememberCoroutineScope()
-
     Surface(modifier = Modifier.fillMaxSize()) {
       when (uiState) {
         is CommitViewModel.LoadedUiState -> {
-          Row(
-            modifier = Modifier
-              .wrapContentSize()
-              .padding(16.dp),
-          ) {
-            DropDownMenu(
+          Column {
+            Row(
               modifier = Modifier
                 .wrapContentSize()
-                .padding(end = 8.dp),
-              label = "Commit Type",
-              items = uiState.commitTypes,
-              selectedItem = uiState.selectedCommitType,
-              onItemSelected = { onTypeSelected(it) },
-              adapter = CommitTypeAdapter
+                .padding(16.dp),
+            ) {
+              DropDownMenu(
+                modifier = Modifier
+                  .wrapContentSize()
+                  .padding(end = 8.dp),
+                label = "Commit Type",
+                items = uiState.commitTypes,
+                selectedItem = uiState.selectedCommitType,
+                onItemSelected = { onTypeSelected(it) },
+                adapter = CommitTypeAdapter
+              )
+              LabelledCheckbox(
+                modifier = Modifier.padding(start = 8.dp),
+                checked = uiState.useGitmoji,
+                onCheckedChange = onGitmojiOptionChecked,
+                label = "Gitmoji"
+              )
+            }
+            Divider(
+              modifier =
+              Modifier
+                .fillMaxWidth()
+                .width(2.dp)
+                .padding(horizontal = 16.dp)
             )
-            LabelledCheckbox(
-              modifier = Modifier.padding(start = 8.dp),
-              checked = uiState.useGitmoji,
-              onCheckedChange = onGitmojiOptionChecked,
-              label = "Gitmoji"
-            )
-          }
-        }
+          }        }
 
         is CommitViewModel.IdleUiState -> {
           EmptyContent("The Content is loading")
