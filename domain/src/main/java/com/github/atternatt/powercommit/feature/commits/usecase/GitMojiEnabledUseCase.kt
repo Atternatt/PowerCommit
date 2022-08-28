@@ -12,15 +12,15 @@ interface GitMojiEnabledUseCase {
   suspend fun setGitmojiEnabled(flag: Boolean)
 }
 
-internal fun gitMojiEnabledUseCase(properties: Properties, pcDispatchers: PCDispatchers) = object : GitMojiEnabledUseCase {
+internal fun gitmojiEnabledUseCase(properties: Properties, pcDispatchers: PCDispatchers) = object : GitMojiEnabledUseCase {
 
   private var gitmojiEnabled: Boolean by properties.observableBooleanProperty(false) {
-    _gitmojiEnabledflow.tryEmit(it)
+    gitmojiEnabledFlow.tryEmit(it)
   }
 
-  val _gitmojiEnabledflow: MutableSharedFlow<Boolean> = MutableSharedFlow(1)
+  private val gitmojiEnabledFlow: MutableSharedFlow<Boolean> = MutableSharedFlow(1)
 
-  override fun getIsGitmojiEnabledStream(): Flow<Boolean> = _gitmojiEnabledflow
+  override fun getIsGitmojiEnabledStream(): Flow<Boolean> = gitmojiEnabledFlow
     .onStart { emit(gitmojiEnabled) }
     .flowOn(pcDispatchers.io)
 
