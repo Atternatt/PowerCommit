@@ -1,11 +1,13 @@
 package com.github.atternatt.powercommit.feature.commits.presentation
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.atternatt.powercommit.feature.commits.di.commitDependencies
 import com.github.atternatt.powercommit.storage.PCProperties
@@ -16,7 +18,9 @@ import com.github.atternatt.powercommit.widgets.LabelledCheckbox
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import javax.swing.JComponent
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.CoroutineContext
@@ -44,8 +48,7 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
           Screen(
             uiState = state,
             onTypeSelected = viewModel::selectCommitType,
-            onGitmojiOptionChecked = viewModel::useGitmoji,
-            pull = viewModel::pull
+            onGitmojiOptionChecked = viewModel::useGitmoji
           )
         }
       }
@@ -63,13 +66,9 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
   fun Screen(
     uiState: CommitViewModel.UiState,
     onTypeSelected: (Int) -> Unit,
-    pull: () -> Unit,
     onGitmojiOptionChecked: (Boolean) -> Unit
   ) {
     val scope = rememberCoroutineScope()
-    val currentPull by rememberUpdatedState(pull)
-    val currentOnTypeSelected by rememberUpdatedState(onTypeSelected)
-    val currentonGitmojiOptionChecked by rememberUpdatedState(onGitmojiOptionChecked)
 
     Surface(modifier = Modifier.fillMaxSize()) {
       when (uiState) {
@@ -86,34 +85,25 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
               label = "Commit Type",
               items = uiState.commitTypes,
               selectedItem = uiState.selectedCommitType,
-              onItemSelected = { currentOnTypeSelected(it) },
+              onItemSelected = { onTypeSelected(it) },
               adapter = CommitTypeAdapter
             )
             LabelledCheckbox(
               modifier = Modifier.padding(start = 8.dp),
               checked = uiState.useGitmoji,
-              onCheckedChange = currentonGitmojiOptionChecked,
+              onCheckedChange = onGitmojiOptionChecked,
               label = "Gitmoji"
             )
           }
         }
 
         is CommitViewModel.IdleUiState -> {
-            Button(modifier = Modifier, onClick = {
-              currentPull()
-            }) {
-              Text("Pull")
-            }
-//            EmptyContent("The Content is loading")
+          EmptyContent("The Content is loading")
         }
 
         else -> {
+          val error = (uiState as CommitViewModel.Error).failure
           EmptyContent("There is no content to show")
-          Button(modifier = Modifier,
-            onClick = { currentPull() },
-          colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)) {
-            Text("Pull")
-          }
         }
       }
     }

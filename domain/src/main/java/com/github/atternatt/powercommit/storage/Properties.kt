@@ -32,7 +32,7 @@ internal fun Properties.stringProperty() = object : ReadWriteProperty<Any, Strin
     }
 }
 
-internal inline fun Properties.observableBooleanProperty(initialValue: Boolean, crossinline emit: (Boolean) -> Unit) =
+internal fun Properties.observableBooleanProperty(initialValue: Boolean, emit: (Boolean) -> Unit) =
     object : ObservableProperty<Boolean>(initialValue) {
 
         override fun afterChange(property: KProperty<*>, oldValue: Boolean, newValue: Boolean) {
@@ -48,9 +48,6 @@ internal inline fun Properties.observableBooleanProperty(initialValue: Boolean, 
 
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) {
             val oldValue = getBoolean(property.name, default = false)
-            if (!beforeChange(property, oldValue, value)) {
-                return
-            }
             setBoolean(property.name, value)
             afterChange(property, oldValue, value)
         }

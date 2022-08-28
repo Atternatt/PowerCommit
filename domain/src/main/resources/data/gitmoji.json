@@ -1,0 +1,394 @@
+[
+  {
+    "emoji": "🎨",
+    "entity": "&#x1f3a8;",
+    "code": ":art:",
+    "description": "Improve structure / format of the code.",
+    "name": "art",
+    "semver": "style"
+  },
+  {
+    "emoji": "⚡️",
+    "entity": "&#x26a1;",
+    "code": ":zap:",
+    "description": "Improve performance.",
+    "name": "zap",
+    "semver": "perf"
+  },
+  {
+    "emoji": "🔥",
+    "entity": "&#x1f525;",
+    "code": ":fire:",
+    "description": "Remove code or files.",
+    "name": "fire",
+    "semver": "remove"
+  },
+  {
+    "emoji": "🐛",
+    "entity": "&#x1f41b;",
+    "code": ":bug:",
+    "description": "Fix a bug.",
+    "name": "bug",
+    "semver": "fix"
+  },
+  {
+    "emoji": "🚑️",
+    "entity": "&#128657;",
+    "code": ":ambulance:",
+    "description": "Critical hotfix.",
+    "name": "ambulance",
+    "semver": "hotfix"
+  },
+  {
+    "emoji": "✨",
+    "entity": "&#x2728;",
+    "code": ":sparkles:",
+    "description": "Introduce new features.",
+    "name": "sparkles",
+    "semver": "feature"
+  },
+  {
+    "emoji": "📝",
+    "entity": "&#x1f4dd;",
+    "code": ":memo:",
+    "description": "Add or update documentation.",
+    "name": "memo",
+    "semver": "doc"
+  },
+  {
+    "emoji": "🚀",
+    "entity": "&#x1f680;",
+    "code": ":rocket:",
+    "description": "Deploy stuff.",
+    "name": "rocket",
+    "semver": "deploy"
+  },
+  {
+    "emoji": "💄",
+    "entity": "&#ff99cc;",
+    "code": ":lipstick:",
+    "description": "Add or update the UI and style files.",
+    "name": "lipstick",
+    "semver": "ui"
+  },
+  {
+    "emoji": "🎉",
+    "entity": "&#127881;",
+    "code": ":tada:",
+    "description": "Begin a project.",
+    "name": "tada",
+    "semver": "init"
+  },
+  {
+    "emoji": "✅",
+    "entity": "&#x2705;",
+    "code": ":white_check_mark:",
+    "description": "Add, update, or pass tests.",
+    "name": "white-check-mark",
+    "semver": "test"
+  },
+  {
+    "emoji": "🔒️",
+    "entity": "&#x1f512;",
+    "code": ":lock:",
+    "description": "Fix security issues.",
+    "name": "lock",
+    "semver": "fix"
+  },
+  {
+    "emoji": "🔖",
+    "entity": "&#x1f516;",
+    "code": ":bookmark:",
+    "description": "Release / Version tags.",
+    "name": "bookmark",
+    "semver": "release"
+  },
+  {
+    "emoji": "🚨",
+    "entity": "&#x1f6a8;",
+    "code": ":rotating_light:",
+    "description": "Fix compiler / linter warnings.",
+    "name": "rotating-light",
+    "semver": "lint"
+  },
+  {
+    "emoji": "🚧",
+    "entity": "&#x1f6a7;",
+    "code": ":construction:",
+    "description": "Work in progress.",
+    "name": "construction",
+    "semver": "wip"
+  },
+  {
+    "emoji": "💚",
+    "entity": "&#x1f49a;",
+    "code": ":green_heart:",
+    "description": "Fix CI Build.",
+    "name": "green-heart",
+    "semver": "ci"
+  },
+  {
+    "emoji": "⬇️",
+    "entity": "⬇️",
+    "code": ":arrow_down:",
+    "description": "Downgrade dependencies.",
+    "name": "arrow-down",
+    "semver": "down"
+  },
+  {
+    "emoji": "⬆️",
+    "entity": "⬆️",
+    "code": ":arrow_up:",
+    "description": "Upgrade dependencies.",
+    "name": "arrow-up",
+    "semver": "up"
+  },
+  {
+    "emoji": "📌",
+    "entity": "&#x1F4CC;",
+    "code": ":pushpin:",
+    "description": "Pin dependencies to specific versions.",
+    "name": "pushpin",
+    "semver": "pin"
+  },
+  {
+    "emoji": "👷",
+    "entity": "&#x1f477;",
+    "code": ":construction_worker:",
+    "description": "Add or update CI build system.",
+    "name": "construction-worker",
+    "semver": "ci_update"
+  },
+  {
+    "emoji": "📈",
+    "entity": "&#x1F4C8;",
+    "code": ":chart_with_upwards_trend:",
+    "description": "Add or update analytics or track code.",
+    "name": "chart-with-upwards-trend",
+    "semver": "analytics"
+  },
+  {
+    "emoji": "♻️",
+    "entity": "&#x2672;",
+    "code": ":recycle:",
+    "description": "Refactor code.",
+    "name": "recycle",
+    "semver": "refactor"
+  },
+  {
+    "emoji": "➕",
+    "entity": "&#10133;",
+    "code": ":heavy_plus_sign:",
+    "description": "Add a dependency.",
+    "name": "heavy-plus-sign",
+    "semver": "add_dep"
+  },
+  {
+    "emoji": "➖",
+    "entity": "&#10134;",
+    "code": ":heavy_minus_sign:",
+    "description": "Remove a dependency.",
+    "name": "heavy-minus-sign",
+    "semver": "remove_dep"
+  },
+  {
+    "emoji": "🔧",
+    "entity": "&#x1f527;",
+    "code": ":wrench:",
+    "description": "Add or update configuration files.",
+    "name": "wrench",
+    "semver": "config"
+  },
+  {
+    "emoji": "🌐",
+    "entity": "&#127760;",
+    "code": ":globe_with_meridians:",
+    "description": "Internationalization and localization.",
+    "name": "globe-with-meridians",
+    "semver": "locale"
+  },
+  {
+    "emoji": "✏️",
+    "entity": "&#59161;",
+    "code": ":pencil2:",
+    "description": "Fix typos.",
+    "name": "pencil2",
+    "semver": "typo"
+  },
+  {
+    "emoji": "💩",
+    "entity": "&#58613;",
+    "code": ":poop:",
+    "description": "Write bad code that needs to be improved.",
+    "name": "poop",
+    "semver": "bad"
+  },
+  {
+    "emoji": "⏪️",
+    "entity": "&#9194;",
+    "code": ":rewind:",
+    "description": "Revert changes.",
+    "name": "rewind",
+    "semver": "revert"
+  },
+  {
+    "emoji": "🔀",
+    "entity": "&#128256;",
+    "code": ":twisted_rightwards_arrows:",
+    "description": "Merge branches.",
+    "name": "twisted-rightwards-arrows",
+    "semver": "merge"
+  },
+  {
+    "emoji": "📦️",
+    "entity": "&#1F4E6;",
+    "code": ":package:",
+    "description": "Add or update compiled files or packages.",
+    "name": "package",
+    "semver": "package"
+  },
+  {
+    "emoji": "👽️",
+    "entity": "&#1F47D;",
+    "code": ":alien:",
+    "description": "Update code due to external API changes.",
+    "name": "alien",
+    "semver": "api"
+  },
+  {
+    "emoji": "🚚",
+    "entity": "&#1F69A;",
+    "code": ":truck:",
+    "description": "Move or rename resources (e.g.: files, paths, routes).",
+    "name": "truck",
+    "semver": "move"
+  },
+  {
+    "emoji": "📄",
+    "entity": "&#1F4C4;",
+    "code": ":page_facing_up:",
+    "description": "Add or update license.",
+    "name": "page-facing-up",
+    "semver": "licence"
+  },
+  {
+    "emoji": "💥",
+    "entity": "&#x1f4a5;",
+    "code": ":boom:",
+    "description": "Introduce breaking changes.",
+    "name": "boom",
+    "semver": "major"
+  },
+  {
+    "emoji": "🍱",
+    "entity": "&#1F371",
+    "code": ":bento:",
+    "description": "Add or update assets.",
+    "name": "bento",
+    "semver": "assets"
+  },
+  {
+    "emoji": "♿️",
+    "entity": "&#9855;",
+    "code": ":wheelchair:",
+    "description": "Improve accessibility.",
+    "name": "wheelchair",
+    "semver": "access"
+  },
+  {
+    "emoji": "💡",
+    "entity": "&#128161;",
+    "code": ":bulb:",
+    "description": "Add or update comments in source code.",
+    "name": "bulb",
+    "semver": "comments"
+  },
+  {
+    "emoji": "💬",
+    "entity": "&#128172;",
+    "code": ":speech_balloon:",
+    "description": "Add or update text and literals.",
+    "name": "speech-balloon",
+    "semver": "text"
+  },
+  {
+    "emoji": "🔊",
+    "entity": "&#128266;",
+    "code": ":loud_sound:",
+    "description": "Add or update logs.",
+    "name": "loud-sound",
+    "semver": "log"
+  },
+  {
+    "emoji": "🚸",
+    "entity": "&#128696;",
+    "code": ":children_crossing:",
+    "description": "Improve user experience / usability.",
+    "name": "children-crossing",
+    "semver": "ux"
+  },
+  {
+    "emoji": "🏗️",
+    "entity": "&#1f3d7;",
+    "code": ":building_construction:",
+    "description": "Make architectural changes.",
+    "name": "building-construction",
+    "semver": "arch"
+  },
+  {
+    "emoji": "🙈",
+    "entity": "&#8bdfe7;",
+    "code": ":see_no_evil:",
+    "description": "Add or update a .gitignore file.",
+    "name": "see-no-evil",
+    "semver": "ignore"
+  },
+  {
+    "emoji": "📸",
+    "entity": "&#128248;",
+    "code": ":camera_flash:",
+    "description": "Add or update snapshots.",
+    "name": "camera-flash",
+    "semver": "snap"
+  },
+  {
+    "emoji": "⚗️",
+    "entity": "&#128248;",
+    "code": ":alembic:",
+    "description": "Perform experiments.",
+    "name": "alembic",
+    "semver": "exp"
+  },
+  {
+    "emoji": "💫",
+    "entity": "&#x1f4ab;",
+    "code": ":dizzy:",
+    "description": "Add or update animations and transitions.",
+    "name": "animation",
+    "semver": "anim"
+  },
+  {
+    "emoji": "🗑️",
+    "entity": "&#x1F5D1;",
+    "code": ":wastebasket:",
+    "description": "Deprecate code that needs to be cleaned up.",
+    "name": "wastebasket",
+    "semver": "deprecate"
+  },
+  {
+    "emoji": "🧐",
+    "entity": "&#x1F9D0;",
+    "code": ":monocle_face:",
+    "description": "Data exploration/inspection.",
+    "name": "monocle-face",
+    "semver": "inspect"
+  },
+  {
+    "emoji": "👔",
+    "entity": "&#128084;",
+    "code": ":necktie:",
+    "description": "Add or update business logic",
+    "name": "necktie",
+    "semver": "business"
+  }
+]

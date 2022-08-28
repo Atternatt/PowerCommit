@@ -81,24 +81,17 @@ fun commitViewModel(
     override val coroutineContext: CoroutineContext = SupervisorJob()
 
     //region State
-    private val commitTypes = flow {
-        emit(getCommitTypesUseCase.getCommitTypes())
-    }
-
     private val selectedCommitType = MutableStateFlow(0)
-
-//    val uiState: StateFlow<CommitViewModel.UiState> = launchMolecule(clock = Immediate) {
-//        TODO()
-//    }
 
     override val state: StateFlow<CommitViewModel.UiState> =
         combine(
-            gitMojiEnabledUseCase.getIsGitmojiEnabledStream().onStart { emit(false) },
+            getCommitTypesUseCase.getCommitTypes(),
+            gitMojiEnabledUseCase.getIsGitmojiEnabledStream(),
             selectedCommitType.onStart { emit(0) }
-        ) { gitmojiEnabled, selectedTypeIndex ->
+        ) { types, gitmojiEnabled, selectedTypeIndex ->
             effect<DomainFailure, CommitViewModel.UiState> {
                 CommitViewModel.LoadedUiState(
-                    commitTypes = listOf(CommitType("😅", "aa", "aa", "aa", "aa", "aa")),
+                    commitTypes = types.bind(),
                     selectedCommitType = selectedTypeIndex,
                     useGitmoji = gitmojiEnabled
                 )
@@ -115,7 +108,9 @@ fun commitViewModel(
 
     //region API
     override fun selectCommitType(index: Int) {
-        selectedCommitType.value = index
+        launch {
+            selectedCommitType.value = index
+        }
     }
 
     override fun useGitmoji(flag: Boolean) {

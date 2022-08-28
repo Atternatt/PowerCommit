@@ -15,9 +15,10 @@ interface CommitDependencies {
 fun commitDependencies(properties: Properties): CommitDependencies = object : CommitDependencies {
 
   override val commitViewModel: CommitViewModel by lazy {
+    val dispatchers = pluginDispatchers()
     commitViewModel(
-      getCommitTypesUseCase = getCommitTypesUseCase(),
-      gitMojiEnabledUseCase = gitMojiEnabledUseCase(properties, pluginDispatchers())
+      getCommitTypesUseCase = getCommitTypesUseCase(dispatchers),
+      gitMojiEnabledUseCase = gitMojiEnabledUseCase(properties, dispatchers)
     )
   }
 
