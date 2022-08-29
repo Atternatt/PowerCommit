@@ -30,5 +30,5 @@ data class Commit(
 
     override fun toString(): String =
 
-        """${if(useGitmoji) commitType.emoji else commitType.semver}($scope): $title ${formattedBody()}${formattedIssueId()}""".trimMargin()
+        "${if(useGitmoji) commitType.emoji else commitType.semver}($scope): $title ${formattedBody()}${formattedIssueId()}".trimMargin()
 }

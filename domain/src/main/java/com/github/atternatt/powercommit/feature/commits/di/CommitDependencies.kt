@@ -3,6 +3,7 @@ package com.github.atternatt.powercommit.feature.commits.di
 import com.github.atternatt.powercommit.feature.commits.presentation.CommitViewModel
 import com.github.atternatt.powercommit.feature.commits.presentation.commitViewModel
 import com.github.atternatt.powercommit.feature.commits.usecase.getCommitTypesUseCase
+import com.github.atternatt.powercommit.feature.commits.usecase.getScopeUseCase
 import com.github.atternatt.powercommit.feature.commits.usecase.gitmojiEnabledUseCase
 import com.github.atternatt.powercommit.storage.Properties
 
@@ -18,7 +19,8 @@ fun commitDependencies(properties: Properties): CommitDependencies = object : Co
     val dispatchers = pluginDispatchers()
     commitViewModel(
       getCommitTypesUseCase = getCommitTypesUseCase(dispatchers),
-      gitMojiEnabledUseCase = gitmojiEnabledUseCase(properties, dispatchers)
+      gitMojiEnabledUseCase = gitmojiEnabledUseCase(properties, dispatchers),
+      scopeUseCase = getScopeUseCase(properties, dispatchers)
     )
   }
 

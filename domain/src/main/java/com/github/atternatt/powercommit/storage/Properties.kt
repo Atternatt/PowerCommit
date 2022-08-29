@@ -53,3 +53,24 @@ internal fun Properties.observableBooleanProperty(initialValue: Boolean, emit: (
         }
     }
 
+internal fun Properties.observableStringProperty(initialValue: String, emit: (String) -> Unit) =
+    object : ObservableProperty<String>(initialValue) {
+
+        override fun afterChange(property: KProperty<*>, oldValue: String, newValue: String) {
+            emit(newValue)
+        }
+
+        override fun beforeChange(property: KProperty<*>, oldValue: String, newValue: String): Boolean =
+            oldValue != newValue
+
+        override fun getValue(thisRef: Any?, property: KProperty<*>): String {
+            return getString(property.name, default = "")
+        }
+
+        override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
+            val oldValue = getString(property.name, default = "")
+            setString(property.name, value)
+            afterChange(property, oldValue, value)
+        }
+    }
+

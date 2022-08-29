@@ -1,13 +1,25 @@
 package com.github.atternatt.powercommit.feature.commits.presentation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.TooltipArea
+import androidx.compose.foundation.TooltipPlacement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
-import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import com.github.atternatt.powercommit.feature.commits.di.commitDependencies
+import com.github.atternatt.powercommit.feature.commits.presentation.CommitViewModel.MetadataState
 import com.github.atternatt.powercommit.storage.PCProperties
 import com.github.atternatt.powercommit.theme.WidgetTheme
 import com.github.atternatt.powercommit.widgets.DropDownMenu
@@ -30,29 +42,102 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
 
   private val viewModel: CommitViewModel by lazy { commitDependencies(PCProperties(PropertiesComponent.getInstance())).commitViewModel }
 
-
   init {
     title = "Commit"
     setOKButtonText("OK")
     init()
   }
 
+  @OptIn(ExperimentalFoundationApi::class)
   override fun createCenterPanel(): JComponent =
     ComposePanel().apply {
-      setBounds(0, 0, 600, 400)
+      setBounds(0, 0, 400, 400)
       setContent {
         WidgetTheme {
-          val state by viewModel.state.collectAsState()
-          Screen(
-            uiState = state,
-            onTypeSelected = viewModel::selectCommitType,
-            onGitmojiOptionChecked = viewModel::useGitmoji
-          )
+          val state by viewModel.metadataState.collectAsState()
+          val commitState by viewModel.commitState.collectAsState()
+          val commitTypeState by viewModel.commitTypeState.collectAsState()
+          Surface(modifier = Modifier.wrapContentSize()) {
+            Row {
+              Column(
+                modifier = Modifier.wrapContentSize()
+              ) {
+                MetadataSection(
+                  uiState = state,
+                  onTypeSelected = viewModel::selectCommitType,
+                  onGitmojiOptionChecked = viewModel::useGitmoji,
+                  onScopeChanged = viewModel::setScope,
+                  onIdChanged = viewModel::setTaskId
+                ) {
+                  Row(
+                    modifier = Modifier
+                      .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                  ) {
+                    CommitTypesSection(
+                      state = commitTypeState,
+                      onCommitTypeSelected = viewModel::selectCommitType
+                    )
+                    TooltipArea(
+                      tooltip = {
+                        // composable tooltip content
+                        Surface(
+                          modifier = Modifier.shadow(4.dp),
+                          shape = RoundedCornerShape(4.dp)
+                        ) {
+                          Text(
+                            text = "When checked the plugin will use the emoji instead of the text code",
+                            modifier = Modifier.padding(8.dp)
+                          )
+                        }
+                      },
+                      modifier = Modifier.padding(start = 40.dp),
+                      delayMillis = 600, // in milliseconds
+                      tooltipPlacement = TooltipPlacement.CursorPoint(
+                        alignment = Alignment.BottomEnd
+                      )
+                    ) {
+                      Icon(
+                        modifier = Modifier
+                          .alpha(if (state.useGitmoji) 1f else 0.35f)
+                          .clickable { viewModel.useGitmoji(!state.useGitmoji) },
+                        imageVector = Icons.Default.Face, contentDescription = "Use Emoji"
+                      )
+                    }
+                  }
+                }
+                CommitSection(
+                  uiState = commitState,
+                  onTitleChanged = viewModel::setTitle,
+                  onBodyChanged = viewModel::setBody
+                )
+              }
+              Divider(
+                modifier = Modifier
+                  .fillMaxHeight()
+                  .width(2.dp)
+                  .padding(vertical = 16.dp)
+              )
+              Column {
+                LabelledCheckbox(
+                  modifier = Modifier.padding(start = 8.dp),
+                  checked = false,
+                  onCheckedChange = viewModel::useGitmoji,
+                  label = "Gitmoji"
+                )
+              }
+            }
+          }
         }
       }
     }
 
-  fun getCommit(): String = TODO()
+  fun getCommit(): String {
+    return viewModel.getCommit().fold(
+      ifEmpty = { "" },
+      ifSome = { it.toString() }
+    )
+  }
 
   override fun dispose() {
     super.dispose()
@@ -60,56 +145,97 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
     cancel()
   }
 
+
   @Composable
-  fun Screen(
-    uiState: CommitViewModel.UiState,
-    onTypeSelected: (Int) -> Unit,
-    onGitmojiOptionChecked: (Boolean) -> Unit
+  fun CommitTypesSection(
+    state: CommitViewModel.CommitTypeState,
+    onCommitTypeSelected: (Int) -> Unit
   ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-      when (uiState) {
-        is CommitViewModel.LoadedUiState -> {
-          Column {
-            Row(
-              modifier = Modifier
-                .wrapContentSize()
-                .padding(16.dp),
-            ) {
-              DropDownMenu(
-                modifier = Modifier
-                  .wrapContentSize()
-                  .padding(end = 8.dp),
-                label = "Commit Type",
-                items = uiState.commitTypes,
-                selectedItem = uiState.selectedCommitType,
-                onItemSelected = { onTypeSelected(it) },
-                adapter = CommitTypeAdapter
-              )
-              LabelledCheckbox(
-                modifier = Modifier.padding(start = 8.dp),
-                checked = uiState.useGitmoji,
-                onCheckedChange = onGitmojiOptionChecked,
-                label = "Gitmoji"
-              )
-            }
-            Divider(
-              modifier =
-              Modifier
-                .fillMaxWidth()
-                .width(2.dp)
-                .padding(horizontal = 16.dp)
-            )
-          }        }
-
-        is CommitViewModel.IdleUiState -> {
-          EmptyContent("The Content is loading")
-        }
-
-        else -> {
-          val error = (uiState as CommitViewModel.Error).failure
-          EmptyContent("There is no content to show")
-        }
+    when (state) {
+      is CommitViewModel.CommitTypeState.Error -> EmptyContent("Error loading commit types")
+      CommitViewModel.CommitTypeState.Idle -> EmptyContent("Loading Commit types")
+      is CommitViewModel.CommitTypeState.Success -> {
+        DropDownMenu(
+          label = "Commit Type",
+          items = state.commitTypes.toList(),
+          selectedItem = state.selectedCommitType,
+          onItemSelected = onCommitTypeSelected,
+          adapter = CommitTypeAdapter
+        )
       }
     }
   }
+
+  @Composable
+  fun MetadataSection(
+    uiState: MetadataState,
+    onTypeSelected: (Int) -> Unit,
+    onGitmojiOptionChecked: (Boolean) -> Unit,
+    onScopeChanged: (String) -> Unit,
+    onIdChanged: (String) -> Unit,
+    header: @Composable () -> Unit
+  ) {
+    Box {
+      header()
+    }
+    Divider(
+      modifier =
+      Modifier
+        .fillMaxWidth()
+        .width(2.dp)
+        .padding(horizontal = 16.dp)
+    )
+    Row(
+      modifier = Modifier.fillMaxWidth()
+        .height(IntrinsicSize.Min)
+        .padding(horizontal = 16.dp)
+        .padding(top = 8.dp)
+    ) {
+      OutlinedTextField(value = uiState.scope, onValueChange = onScopeChanged,
+        modifier = Modifier
+          .weight(1f, true)
+          .padding(end = 4.dp),
+        maxLines = 1,
+        label = { Text("Scope") }
+      )
+      OutlinedTextField(value = uiState.id, onValueChange = onIdChanged,
+        modifier = Modifier
+          .weight(1f, true)
+          .padding(start = 4.dp),
+        maxLines = 1,
+        label = { Text("Task ID") }
+      )
+    }
+  }
+
+}
+
+@Composable
+fun CommitSection(
+  uiState: CommitViewModel.CommitState,
+  onTitleChanged: (String) -> Unit,
+  onBodyChanged: (String) -> Unit
+) {
+  OutlinedTextField(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(16.dp),
+    maxLines = 1,
+    value = uiState.title,
+    label = { Text("Title") },
+    onValueChange = onTitleChanged
+  )
+  Text(
+    modifier = Modifier.padding(horizontal = 20.dp),
+    text = "Body",
+    style = MaterialTheme.typography.overline
+  )
+  OutlinedTextField(
+    modifier = Modifier.wrapContentSize()
+      .fillMaxSize()
+      .padding(horizontal = 16.dp)
+      .padding(top = 4.dp, bottom = 16.dp),
+    value = uiState.body,
+    onValueChange = onBodyChanged
+  )
 }
