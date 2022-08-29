@@ -3,5 +3,9 @@
 # PowerCommit Changelog
 
 ## [Unreleased]
+
+## [1.0.0] - 2022-08-29
 ### Added
-- Initial scaffold created from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
+- A Commit extension Dialog that allows you to fill a form that will format the commit with the expected karma style
+- Settings to switych from text types to gitmoji types
+- It remembers the last scope to avoid repeating yourself
