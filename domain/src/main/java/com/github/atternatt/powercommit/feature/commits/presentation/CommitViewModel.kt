@@ -145,8 +145,8 @@ fun commitViewModel(
 
     override val commitTypeState: StateFlow<CommitViewModel.CommitTypeState> =
         combine(
-            getCommitTypesUseCase.getCommitTypes().shareIn(this, started = SharingStarted.Eagerly, replay = 1),
-            selectedCommitTypeStream
+            getCommitTypesUseCase.getCommitTypes(),
+            selectedCommitTypeStream.asStateFlow()
         ) { commitTypes, selectedType ->
             either<DomainFailure, CommitViewModel.CommitTypeState> {
                 CommitViewModel.CommitTypeState.Success(
@@ -162,28 +162,26 @@ fun commitViewModel(
         }
             .stateIn(
                 scope = this,
-                started = SharingStarted.Eagerly,
+                started = SharingStarted.WhileSubscribed(5_000L),
                 initialValue = CommitViewModel.CommitTypeState.Idle
             )
 
-    override val metadataState: StateFlow<MetadataState> =
-        combine(
-            gitMojiEnabledUseCase.getIsGitmojiEnabledStream(),
-            selectedCommitTypeStream.onStart { emit(0) },
-            scopeUseCase.getScopeStream(),
-            taskId.onStart { emit("") }
-        ) { gitmojiEnabled, selectedTypeIndex, scope, taskId ->
-            MetadataState(
-                id = taskId,
-                useGitmoji = gitmojiEnabled,
-                scope = scope
-            )
-        }
-            .stateIn(
-                scope = this,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = MetadataState()
-            )
+    override val metadataState: StateFlow<MetadataState> = combine(
+                gitMojiEnabledUseCase.getIsGitmojiEnabledStream(),
+                scopeUseCase.getScopeStream(),
+                taskId.asStateFlow()
+            ) { gitmojiEnabled, scope, taskId ->
+                MetadataState(
+                    id = taskId,
+                    useGitmoji = gitmojiEnabled,
+                    scope = scope
+                )
+            }
+                .stateIn(
+                    scope = this,
+                    started = SharingStarted.WhileSubscribed(),
+                    initialValue = MetadataState()
+                )
 
 
     //endregion
@@ -195,8 +193,8 @@ fun commitViewModel(
     private val bodyStream = MutableStateFlow("")
 
     override val commitState: StateFlow<CommitViewModel.CommitState> = combine(
-        titleStream,
-        bodyStream
+        titleStream.asStateFlow(),
+        bodyStream.asStateFlow()
     ) { title, body ->
         CommitViewModel.CommitState(
             title = title,
@@ -204,7 +202,7 @@ fun commitViewModel(
         )
     }.stateIn(
         scope = this,
-        started = SharingStarted.WhileSubscribed(),
+        started = SharingStarted.WhileSubscribed(5_000L),
         initialValue = CommitViewModel.CommitState()
     )
 
@@ -213,8 +211,8 @@ fun commitViewModel(
 
     //region API
     override fun selectCommitType(index: Int) {
-        launch {
-            selectedCommitTypeStream.value = index
+        selectedCommitTypeStream.update {
+            index
         }
     }
 
@@ -225,9 +223,7 @@ fun commitViewModel(
     }
 
     override fun setTaskId(id: String) {
-        launch {
-            taskId.emit(id)
-        }
+        taskId.update { id }
     }
 
     override fun setScope(scope: String) {
@@ -237,15 +233,11 @@ fun commitViewModel(
     }
 
     override fun setTitle(title: String) {
-        launch {
-            titleStream.emit(title)
-        }
+        titleStream.update { title }
     }
 
     override fun setBody(body: String) {
-        launch {
-            bodyStream.emit(body)
-        }
+        bodyStream.update { body }
     }
 
     override fun getCommit(): Option<Commit> {

@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.*
 
 
 interface GitMojiEnabledUseCase {
-  fun getIsGitmojiEnabledStream(): Flow<Boolean>
+  fun getIsGitmojiEnabledStream(): StateFlow<Boolean>
 
   suspend fun setGitmojiEnabled(flag: Boolean)
 }
@@ -42,11 +42,9 @@ internal fun gitmojiEnabledUseCase(properties: Properties, pcDispatchers: PCDisp
     gitmojiEnabledFlow.tryEmit(it)
   }
 
-  private val gitmojiEnabledFlow: MutableSharedFlow<Boolean> = MutableSharedFlow(1)
+  private val gitmojiEnabledFlow: MutableStateFlow<Boolean> = MutableStateFlow(gitmojiEnabled)
 
-  override fun getIsGitmojiEnabledStream(): Flow<Boolean> = gitmojiEnabledFlow
-    .onStart { emit(gitmojiEnabled) }
-    .flowOn(pcDispatchers.io)
+  override fun getIsGitmojiEnabledStream(): StateFlow<Boolean> = gitmojiEnabledFlow
 
   override suspend fun setGitmojiEnabled(flag: Boolean) {
     gitmojiEnabled = flag
