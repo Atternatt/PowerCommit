@@ -24,7 +24,10 @@
 
 package com.github.atternatt.powercommit.feature.commits.presentation
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.TooltipArea
+import androidx.compose.foundation.TooltipPlacement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -33,20 +36,16 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.github.atternatt.powercommit.feature.commits.di.commitDependencies
 import com.github.atternatt.powercommit.feature.commits.presentation.CommitViewModel.MetadataState
 import com.github.atternatt.powercommit.storage.PCProperties
 import com.github.atternatt.powercommit.theme.WidgetTheme
-import com.github.atternatt.powercommit.theme.green200
-import com.github.atternatt.powercommit.theme.green500
 import com.github.atternatt.powercommit.widgets.DropDownMenu
 import com.github.atternatt.powercommit.widgets.EmptyContent
 import com.github.atternatt.powercommit.widgets.LabelledCheckbox
@@ -63,9 +62,8 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.CoroutineContext
 
 @ExperimentalContracts
-class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineScope {
+class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineScope by CoroutineScope(Dispatchers.Swing) {
 
-  override val coroutineContext: CoroutineContext = Job()
 
   private val viewModel: CommitViewModel by lazy { commitDependencies(PCProperties(PropertiesComponent.getInstance())).commitViewModel }
 
@@ -81,9 +79,9 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
       setBounds(0, 0, 400, 400)
       setContent {
         WidgetTheme {
-          val state by viewModel.metadataState.collectAsState()
-          val commitState by viewModel.commitState.collectAsState()
-          val commitTypeState by viewModel.commitTypeState.collectAsState()
+          val state by viewModel.metadataState.collectAsState(context = coroutineContext)
+          val commitState by viewModel.commitState.collectAsState(context = coroutineContext)
+          val commitTypeState by viewModel.commitTypeState.collectAsState(context = coroutineContext)
           Surface(modifier = Modifier.wrapContentSize()) {
             Row {
               Column(

@@ -45,7 +45,7 @@ fun interface GetCommitTypesUseCase {
 }
 
 internal fun getCommitTypesUseCase(dispatcher: PCDispatchers) = GetCommitTypesUseCase {
-    flowOf(effect {
+    flowOf<Effect<DomainFailure, Set<CommitType>>>(effect {
         val data = javaClass.classLoader.getResource("data/gitmoji.json")?.readText()
         ensureNotNull(data) { NotFound }
         ensure(data.isNotEmpty()) { DataEmpty }
@@ -55,7 +55,7 @@ internal fun getCommitTypesUseCase(dispatcher: PCDispatchers) = GetCommitTypesUs
         } catch (e: Exception) {
             shift(UnknownFailure(e))
         }
-    })
+    }).flowOn(dispatcher.io)
 
 
 
