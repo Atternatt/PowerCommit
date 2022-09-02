@@ -1,8 +1,8 @@
 # PowerCommit
 
 ![Build](https://github.com/Atternatt/PowerCommit/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/19806-powercommit.svg)](https://plugins.jetbrains.com/plugin/19806-powercommit)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/19806-powercommit.svg)](https://plugins.jetbrains.com/plugin/19806-powercommit)
 
 ## Template ToDo list
 - [x] Create a new [IntelliJ Platform Plugin Template][template] project.
