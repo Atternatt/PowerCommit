@@ -26,23 +26,25 @@ package com.github.atternatt.powercommit.feature.commits.di
 
 import com.github.atternatt.powercommit.feature.commits.presentation.CommitViewModel
 import com.github.atternatt.powercommit.feature.commits.presentation.commitViewModel
+import com.github.atternatt.powercommit.feature.commits.usecase.GetCommitTypesUseCase
 import com.github.atternatt.powercommit.feature.commits.usecase.getCommitTypesUseCase
 import com.github.atternatt.powercommit.feature.commits.usecase.getScopeUseCase
 import com.github.atternatt.powercommit.feature.commits.usecase.gitmojiEnabledUseCase
 import com.github.atternatt.powercommit.storage.Properties
 
 interface CommitDependencies {
-
   val commitViewModel: CommitViewModel
-
+  val getCommitTypesUseCase: GetCommitTypesUseCase
 }
 
 fun commitDependencies(properties: Properties): CommitDependencies = object : CommitDependencies {
+  private val dispatchers = pluginDispatchers()
+
+  override val getCommitTypesUseCase: GetCommitTypesUseCase by lazy { getCommitTypesUseCase(dispatchers) }
 
   override val commitViewModel: CommitViewModel by lazy {
-    val dispatchers = pluginDispatchers()
     commitViewModel(
-      getCommitTypesUseCase = getCommitTypesUseCase(dispatchers),
+      getCommitTypesUseCase = getCommitTypesUseCase,
       gitMojiEnabledUseCase = gitmojiEnabledUseCase(properties, dispatchers),
       scopeUseCase = getScopeUseCase(properties, dispatchers)
     )

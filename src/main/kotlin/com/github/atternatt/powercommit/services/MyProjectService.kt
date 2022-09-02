@@ -24,12 +24,35 @@
 
 package com.github.atternatt.powercommit.services
 
-import com.intellij.openapi.project.Project
 import com.github.atternatt.powercommit.MyBundle
+import com.github.atternatt.powercommit.feature.commits.di.commitDependencies
+import com.github.atternatt.powercommit.feature.commits.model.CommitType
+import com.github.atternatt.powercommit.storage.PCProperties
+import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.project.Project
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 class MyProjectService(project: Project) {
 
+    companion object {
+        var commitTypes: Set<CommitType> = emptySet()
+            private set
+    }
+
     init {
         println(MyBundle.message("projectService", project.name))
+        commitTypes = runBlocking {
+            commitDependencies(PCProperties(PropertiesComponent.getInstance())).getCommitTypesUseCase
+                .getCommitTypes()
+                .first()
+                .let {
+                    it.toEither()
+                        .fold(
+                            ifLeft = { emptySet() },
+                            ifRight = { it }
+                        )
+                }
+        }
     }
 }

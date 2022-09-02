@@ -41,12 +41,14 @@ data class Commit(
         StringBuilder().apply {
             if(body.isNotEmpty()) {
                 append("\n")
+                append("\n")
                 append(body.wrap(LINE_LENGTH))
             }
         }.toString()
 
     private fun formattedIssueId(): String = StringBuilder().apply {
         if(issueId.isNotEmpty()) {
+            append("\n")
             append("\n")
             append("Related issue id: $issueId")
         }

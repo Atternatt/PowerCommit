@@ -32,7 +32,6 @@
     <depends>com.intellij.modules.vcs</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.atternatt.powercommit.services.MyApplicationService"/>
         <projectService serviceImplementation="com.github.atternatt.powercommit.services.MyProjectService"/>
     </extensions>
 

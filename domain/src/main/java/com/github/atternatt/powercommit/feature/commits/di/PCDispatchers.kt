@@ -34,10 +34,7 @@ interface PCDispatchers {
   val main: CoroutineContext
 }
 
-internal fun pluginDispatchers() = object : PCDispatchers {
-  //  private val handler = CoroutineExceptionHandler { _, exception ->
-//    Logger.getGlobal().log(Level.SEVERE, exception.toString())
-//  }
+fun pluginDispatchers() = object : PCDispatchers {
   override val io: CoroutineContext = Dispatchers.IO
   override val main: CoroutineContext = Dispatchers.Swing
 }

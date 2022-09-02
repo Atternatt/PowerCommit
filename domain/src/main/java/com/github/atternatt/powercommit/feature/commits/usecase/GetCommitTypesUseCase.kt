@@ -33,7 +33,9 @@ import com.github.atternatt.powercommit.feature.failue.DataEmpty
 import com.github.atternatt.powercommit.feature.failue.DomainFailure
 import com.github.atternatt.powercommit.feature.failue.NotFound
 import com.github.atternatt.powercommit.feature.failue.UnknownFailure
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -42,16 +44,19 @@ fun interface GetCommitTypesUseCase {
     fun getCommitTypes(): Flow<Effect<DomainFailure, Set<CommitType>>>
 }
 
-fun getCommitTypesUseCase(dispatcher: PCDispatchers) = GetCommitTypesUseCase {
-    flowOf(effect<DomainFailure, Set<CommitType>> {
+internal fun getCommitTypesUseCase(dispatcher: PCDispatchers) = GetCommitTypesUseCase {
+    flowOf<Effect<DomainFailure, Set<CommitType>>>(effect {
         val data = javaClass.classLoader.getResource("data/gitmoji.json")?.readText()
         ensureNotNull(data) { NotFound }
         ensure(data.isNotEmpty()) { DataEmpty }
         try {
-            Json.decodeFromString(data)
+            val res: Set<CommitType> = Json.decodeFromString(data)
+            res
         } catch (e: Exception) {
             shift(UnknownFailure(e))
         }
-    })
-        .flowOn(dispatcher.io)
+    }).flowOn(dispatcher.io)
+
+
+
 }
