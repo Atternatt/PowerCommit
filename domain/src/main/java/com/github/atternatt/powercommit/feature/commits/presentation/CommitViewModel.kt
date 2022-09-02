@@ -24,17 +24,12 @@
 
 package com.github.atternatt.powercommit.feature.commits.presentation
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.continuations.either
 import com.github.atternatt.powercommit.feature.commits.model.Commit
 import com.github.atternatt.powercommit.feature.commits.model.CommitType
 import com.github.atternatt.powercommit.feature.commits.presentation.CommitViewModel.MetadataState
 import com.github.atternatt.powercommit.feature.commits.usecase.GetCommitTypesUseCase
 import com.github.atternatt.powercommit.feature.commits.usecase.GetScopeUseCase
 import com.github.atternatt.powercommit.feature.commits.usecase.GitMojiEnabledUseCase
-import com.github.atternatt.powercommit.feature.failue.DomainFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -51,7 +46,6 @@ interface CommitViewModel {
      */
     val metadataState: StateFlow<MetadataState>
     val commitState: StateFlow<CommitState>
-    val commitTypeState: StateFlow<CommitTypeState>
 //    val commitType: StateFlow<>
 
     /**
@@ -90,26 +84,13 @@ interface CommitViewModel {
     /**
      * Returns a [Commit] object created with all the information handled by this ViewModel
      */
-    fun getCommit(): Option<Commit>
+    fun getCommit(forCommitType: CommitType): Commit
 
     /**
      * Lifecycle event called to clean all the states when the object is no longer used
      */
     fun dispose()
 
-
-    sealed interface CommitTypeState {
-        object Idle : CommitTypeState
-        data class Error(val failure: DomainFailure) : CommitTypeState
-
-        /**
-         * @property commitTypes a [Set] of all the [CommitType] available
-         * @property selectedCommitType the current selected [CommitType] index*/
-        data class Success(
-            val commitTypes: Set<CommitType>,
-            val selectedCommitType: Int
-        ) : CommitTypeState
-    }
 
     /**
      * State representing the loaded screen
@@ -142,29 +123,6 @@ fun commitViewModel(
     private val selectedCommitTypeStream = MutableStateFlow(0)
 
     private val taskId = MutableStateFlow("")
-
-    override val commitTypeState: StateFlow<CommitViewModel.CommitTypeState> =
-        combine(
-            getCommitTypesUseCase.getCommitTypes(),
-            selectedCommitTypeStream.asStateFlow()
-        ) { commitTypes, selectedType ->
-            either<DomainFailure, CommitViewModel.CommitTypeState> {
-                CommitViewModel.CommitTypeState.Success(
-                    commitTypes = commitTypes.bind(),
-                    selectedCommitType = selectedType
-                )
-            }
-        }.map {
-            it.fold(
-                ifLeft = { CommitViewModel.CommitTypeState.Error(it) },
-                ifRight = { it }
-            )
-        }
-            .stateIn(
-                scope = this,
-                started = SharingStarted.WhileSubscribed(5_000L),
-                initialValue = CommitViewModel.CommitTypeState.Idle
-            )
 
     override val metadataState: StateFlow<MetadataState> = combine(
                 gitMojiEnabledUseCase.getIsGitmojiEnabledStream(),
@@ -240,23 +198,15 @@ fun commitViewModel(
         bodyStream.update { body }
     }
 
-    override fun getCommit(): Option<Commit> {
-        val commitTypeValue = commitTypeState.value
-        return if (commitTypeValue is CommitViewModel.CommitTypeState.Success) {
-            Some(
-                Commit(
-                    commitType = commitTypeValue.commitTypes.toList()[commitTypeValue.selectedCommitType],
-                    scope = metadataState.value.scope,
-                    title = commitState.value.title,
-                    body = commitState.value.body,
-                    issueId = metadataState.value.id,
-                    useGitmoji = metadataState.value.useGitmoji
-                )
-            )
-        } else {
-            None
-        }
-    }
+    override fun getCommit(forCommitType: CommitType): Commit =
+        Commit(
+            commitType = forCommitType,
+            scope = metadataState.value.scope,
+            title = commitState.value.title,
+            body = commitState.value.body,
+            issueId = metadataState.value.id,
+            useGitmoji = metadataState.value.useGitmoji
+        )
 
     override fun dispose() {
         cancel()

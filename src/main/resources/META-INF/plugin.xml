@@ -31,6 +31,15 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.vcs</depends>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.github.atternatt.powercommit.services.MyProjectService"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="com.github.atternatt.powercommit.listeners.MyProjectManagerListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </applicationListeners>
+
     <actions>
         <action id="Commit.Button" class="com.github.atternatt.powercommit.CreateCommitAction"
                 text="Create Commit Message"

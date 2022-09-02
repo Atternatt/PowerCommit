@@ -33,9 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
@@ -43,30 +41,29 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import com.github.atternatt.powercommit.feature.commits.di.commitDependencies
+import com.github.atternatt.powercommit.feature.commits.model.CommitType
 import com.github.atternatt.powercommit.feature.commits.presentation.CommitViewModel.MetadataState
+import com.github.atternatt.powercommit.services.MyProjectService
 import com.github.atternatt.powercommit.storage.PCProperties
 import com.github.atternatt.powercommit.theme.WidgetTheme
 import com.github.atternatt.powercommit.widgets.DropDownMenu
-import com.github.atternatt.powercommit.widgets.EmptyContent
 import com.github.atternatt.powercommit.widgets.LabelledCheckbox
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.selects.select
 import javax.swing.JComponent
 import kotlin.contracts.ExperimentalContracts
-import kotlin.coroutines.CoroutineContext
 
 @ExperimentalContracts
-class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineScope by CoroutineScope(Dispatchers.Swing) {
-
+class CreateCommitDialog(project: Project) : DialogWrapper(project),
+  CoroutineScope by CoroutineScope(Dispatchers.Unconfined) {
 
   private val viewModel: CommitViewModel by lazy { commitDependencies(PCProperties(PropertiesComponent.getInstance())).commitViewModel }
-
+  private val selectedCommitTypeState: MutableState<Int> = mutableStateOf(0)
   init {
     title = "Commit"
     setOKButtonText("OK")
@@ -79,14 +76,12 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
       setBounds(0, 0, 400, 400)
       setContent {
         WidgetTheme {
-          val state by viewModel.metadataState.collectAsState(context = coroutineContext)
-          val commitState by viewModel.commitState.collectAsState(context = coroutineContext)
-          val commitTypeState by viewModel.commitTypeState.collectAsState(context = coroutineContext)
           Surface(modifier = Modifier.wrapContentSize()) {
             Row {
               Column(
                 modifier = Modifier.wrapContentSize()
               ) {
+                val state by viewModel.metadataState.collectAsState(context = coroutineContext)
                 MetadataSection(
                   uiState = state,
                   onScopeChanged = viewModel::setScope,
@@ -97,9 +92,12 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
                       .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                   ) {
+
+                    val (selectedType, onSelectedCommitTypeChanged) = remember { selectedCommitTypeState }
                     CommitTypesSection(
-                      state = commitTypeState,
-                      onCommitTypeSelected = viewModel::selectCommitType
+                      commitTypes = MyProjectService.commitTypes,
+                      selectedCommitType = selectedType,
+                      onCommitTypeSelected = onSelectedCommitTypeChanged
                     )
                     TooltipArea(
                       tooltip = {
@@ -129,6 +127,7 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
                     }
                   }
                 }
+                val commitState by viewModel.commitState.collectAsState(context = coroutineContext)
                 CommitSection(
                   uiState = commitState,
                   onTitleChanged = viewModel::setTitle,
@@ -156,10 +155,9 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
     }
 
   fun getCommit(): String {
-    return viewModel.getCommit().fold(
-      ifEmpty = { "" },
-      ifSome = { it.toString() }
-    )
+    return MyProjectService.commitTypes.elementAtOrNull(selectedCommitTypeState.value)?.let {
+      viewModel.getCommit(it).toString()
+    } ?: ""
   }
 
   override fun dispose() {
@@ -168,25 +166,19 @@ class CreateCommitDialog(project: Project) : DialogWrapper(project), CoroutineSc
     cancel()
   }
 
-
   @Composable
   fun CommitTypesSection(
-    state: CommitViewModel.CommitTypeState,
+    commitTypes: Set<CommitType>,
+    selectedCommitType: Int,
     onCommitTypeSelected: (Int) -> Unit
   ) {
-    when (state) {
-      is CommitViewModel.CommitTypeState.Error -> EmptyContent("Error loading commit types")
-      CommitViewModel.CommitTypeState.Idle -> EmptyContent("Loading Commit types")
-      is CommitViewModel.CommitTypeState.Success -> {
         DropDownMenu(
           label = "Commit Type",
-          items = state.commitTypes.toList(),
-          selectedItem = state.selectedCommitType,
+          items = commitTypes.toList(),
+          selectedItem = selectedCommitType,
           onItemSelected = onCommitTypeSelected,
           adapter = CommitTypeAdapter
         )
-      }
-    }
   }
 
   @Composable

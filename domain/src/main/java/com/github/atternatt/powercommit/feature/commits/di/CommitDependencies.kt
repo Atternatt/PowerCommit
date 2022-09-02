@@ -34,15 +34,17 @@ import com.github.atternatt.powercommit.storage.Properties
 
 interface CommitDependencies {
   val commitViewModel: CommitViewModel
+  val getCommitTypesUseCase: GetCommitTypesUseCase
 }
 
 fun commitDependencies(properties: Properties): CommitDependencies = object : CommitDependencies {
   private val dispatchers = pluginDispatchers()
 
+  override val getCommitTypesUseCase: GetCommitTypesUseCase by lazy { getCommitTypesUseCase(dispatchers) }
 
   override val commitViewModel: CommitViewModel by lazy {
     commitViewModel(
-      getCommitTypesUseCase = getCommitTypesUseCase(dispatchers),
+      getCommitTypesUseCase = getCommitTypesUseCase,
       gitMojiEnabledUseCase = gitmojiEnabledUseCase(properties, dispatchers),
       scopeUseCase = getScopeUseCase(properties, dispatchers)
     )
